@@ -40,10 +40,28 @@ def main():
             if response_data['status'] == 'timeout':
                 payload['timestamp'] = response_data['timestamp_to_request']
             else:
-                bot.sendMessage(
-                    text='Работа проверена!',
-                    chat_id=chat_id
-                )
+                for attempt in response_data['new_attempts']:
+                    lesson_title = attempt['lesson_title']
+                    verdict =attempt['is_negative']
+                    lesson_url = attempt['lesson_url']
+
+                    if verdict:
+                        verdict_message='К сожалению, в работе нашлись ошибки.'
+                    else:
+                        verdict_message=(
+                            'Преподавателю все понравилось,'
+                            ' можно приступать к следующему уроку.'
+                        )
+
+                    bot.sendMessage(
+                        text=(
+                            f'У вас проверили работу "{lesson_title}".\n'
+                            f'Ссылка: {lesson_url}\n'
+                            f'{verdict_message}'
+                        ),
+                        chat_id=chat_id
+                    )
+
                 payload['timestamp'] = response_data['last_attempt_timestamp']
 
         except (
@@ -52,7 +70,8 @@ def main():
             telegram.error.NetworkError
         ):
             logger.warning(
-                'Ошибка соединения, подожду немного и попробую переподключиться...'
+                'Ошибка соединения,'
+                ' подожду немного и попробую переподключиться...'
             )
             sleep(5)
             continue
@@ -73,7 +92,7 @@ def main():
 
         except telegram.error.TelegramError:
             logger.exception(
-                f'Упс... Серьезная проблема с телеграмм.'
+                f'Упс... Серьезная проблема с телеграмм.\n'
                 f'Попробую еще раз через время..'
             )
             sleep(60)
