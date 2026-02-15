@@ -5,16 +5,8 @@ import requests
 import telegram
 from environs import Env
 
+
 env = Env()
-env.read_env()
-
-logging.basicConfig(
-    level=env.str('LOG_LEVEL', 'INFO'),
-    format='%(asctime)s [%(name)s] %(levelname)s %(message)s'
-)
-logging.getLogger('urllib3').setLevel(logging.WARNING)
-logging.getLogger('telegram').setLevel(logging.WARNING)
-
 logger = logging.getLogger(__name__)
 
 
@@ -100,4 +92,13 @@ def main():
 
 
 if __name__ == '__main__':
+    env.read_env()
+
+    logging.basicConfig(
+        level=env.str('LOG_LEVEL', 'INFO'),
+        format='%(asctime)s [%(name)s] %(levelname)s %(message)s'
+    )
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
+    logging.getLogger('telegram').setLevel(logging.WARNING)
+
     main()
