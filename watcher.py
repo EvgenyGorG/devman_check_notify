@@ -6,11 +6,20 @@ import telegram
 from environs import Env
 
 
-env = Env()
 logger = logging.getLogger(__name__)
 
 
 def main():
+    env = Env()
+    env.read_env()
+
+    logging.basicConfig(
+        level=env.str("LOG_LEVEL", "INFO"),
+        format="%(asctime)s [%(name)s] %(levelname)s %(message)s",
+    )
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("telegram").setLevel(logging.WARNING)
+
     tg_token = env.str("TG_TOKEN")
     chat_id = env.str("TG_CHAT_ID")
     bot = telegram.Bot(token=tg_token)
@@ -88,13 +97,4 @@ def main():
 
 
 if __name__ == "__main__":
-    env.read_env()
-
-    logging.basicConfig(
-        level=env.str("LOG_LEVEL", "INFO"),
-        format="%(asctime)s [%(name)s] %(levelname)s %(message)s",
-    )
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
-    logging.getLogger("telegram").setLevel(logging.WARNING)
-
     main()
